@@ -3,5 +3,8 @@
 {% block title %}Blog{% endblock %}
 
 {% block body %}
+<div class="container">
+    {{ component('count_blogpost') }}
     {{ component('all_blogpost') }}
+</div>
 {% endblock %}
