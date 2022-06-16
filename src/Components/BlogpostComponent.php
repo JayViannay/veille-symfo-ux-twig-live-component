@@ -11,8 +11,7 @@ class BlogpostComponent
 {
     public int $id;
 
-    public function __construct(private BlogRepository $blogRepository)
-    {}
+    public function __construct(private BlogRepository $blogRepository) {}
 
     public function getBlogpost(): Blog
     {

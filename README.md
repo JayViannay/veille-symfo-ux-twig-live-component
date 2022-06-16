@@ -321,8 +321,63 @@ class BlogpostSearchComponent
 
     public function getBlogposts(): void
     {
+        // ::TODO écrire la fonction dans le blogRepository
         $this->blogRepository->findByQuery($this->query);
     }
 }
 ```
 
+2. Dans le fichier `./src/Repository/BlogRepository.php` ajouter la méthode qui permet de récupérer les objets blog qui correspondent à la recherche.
+```php
+public function findByQuery(string $query): array
+{
+    if (empty($query)) return [];
+
+    return $this->createQueryBuilder('b')
+        ->andWhere('b.title LIKE :query')
+        ->setParameter('query', '%' . $query . '%')
+        ->getQuery()
+        ->getResult()
+    ;
+}
+```
+
+3. Dans le dossier `./templates/components` créer un nouveau fichier `blogpost_search.html.twig` et ajouter le code suivant :
+```html
+<div {{ attributes }} class="m-4">
+    <input 
+        type="search"
+        name="query"
+        value="{{ query }}"
+        data-action="live#update"
+    >
+
+    {% for blogpost in this.blogposts %}
+        {{ component('blogpost', { 'id' : blogpost.id }) }}
+    {% endfor %}
+</div>
+```
+
+3. Dans le controller `./src/Controller/BlogController.php` ajouter le code suivant :
+```php
+#[Route('/search', name: 'app_search')]
+public function search(): Response
+{
+    return $this->render('blog/search.html.twig');
+}
+```
+
+4. Dans le dossier `./templates/blog` créer un nouveau fichier `search.html.twig` et ajouter le code suivant :
+```html
+{% extends 'base.html.twig' %}
+
+{% block title %}Search{% endblock %}
+
+{% block body %}
+    {{ component('blogpost_search') }}
+{% endblock %}
+```
+
+✅ On peut maintenant se rendre sur la page `/search` et faire une recherche ! <br>
+Les objets sont mis à jour automatiquement lorsque le champ de recherche change. <br>
+Sans avoir écrit un seule ligne de javascript 🙌  <br>
