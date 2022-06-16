@@ -1,9 +1,9 @@
 ## Veille Symfony UX TWIG & LIVE COMPONENTS 🔥
 16/06/2022
 
-📌 Documentation [Symfony UX](https://symfony.com/doc/current/frontend/ux.html)
-📌 Documentation [Twig Components](https://symfony.com/bundles/ux-twig-component/current/index.html)
-📌 Documentation [Live Components](https://symfony.com/bundles/ux-live-component/current/index.html)
+📌 Documentation [Symfony UX](https://symfony.com/doc/current/frontend/ux.html) <br>
+📌 Documentation [Twig Components](https://symfony.com/bundles/ux-twig-component/current/index.html) <br>
+📌 Documentation [Live Components](https://symfony.com/bundles/ux-live-component/current/index.html) <br>
 
 
 ### Installation du projet :
@@ -11,30 +11,6 @@
 ##### Créer un nouveau projet Symfony si vous n'en avez pas déjà un :
 ```symfony new veille-twig-component --webapp```
     
-##### Installer symfony/ux-twig-component & symfony/ux-live-components :
-```composer require symfony/ux-twig-component```
-```composer require symfony/ux-live-component```
-
-##### Configuration des dépendances :
-  - Dans le fichier `./assets/bootstrap.js` ajouter le code suivant:
-
-```js
-import LiveController from '@symfony/ux-live-component';
-import '@symfony/ux-live-component/styles/live.css';
-
-app.register('live', LiveController);
-```
-
-*Les dépendances que l'on installe vont générer du javascript, nous sommes donc invités à charger les librairies js avec npm.*
-
-##### Installer les librairies js et lancer un premier build :
-```npm install --force && npm run build```
-
-> *Depuis symfony 6, webpack est déjà configuré, il suffit simplement de télécharger les dépendances avec npm ou yarn.*
-
->❗️ Attention❗️ 
->Il faut toujours utiliser **le même gestionnaire de dépendances** au sein d'un projet, c'est à dire >que si tu choisis yarn install, tu n'utilises que yarn et jamais jamais npm. Si tu utilises npm à des >moments et yarn à d'autres, cela va créer des conflits 🧨 entre le ```package.json``` et le ```yarn.lock``` et ça c'est pas cool 😒
-
 ##### Créer une base de données :
   - Créer un nouveau fichier à la racine du projet nommé ```.env.local```:
   - Dans ```.env.local``` ajouter la variable ```DATABASE_URL``` et les identifiants de connexion à la base de données ainsi que le nom de la base de données que l'on souhaite créer.
@@ -95,9 +71,37 @@ app.register('live', LiveController);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 ```
 
+#### Installer symfony/ux-twig-component & symfony/ux-live-components :
+```composer require symfony/ux-twig-component```
+```composer require symfony/ux-live-component```
+
+##### Configuration des dépendances :
+  - Dans le fichier `./assets/bootstrap.js` ajouter le code suivant:
+
+```js
+import LiveController from '@symfony/ux-live-component';
+import '@symfony/ux-live-component/styles/live.css';
+
+app.register('live', LiveController);
+```
+
+*Les dépendances que l'on installe vont générer du javascript, nous sommes donc invités à charger les librairies js avec npm.*
+
+##### Installer les librairies js et lancer un premier build :
+```npm install --force && npm run build```
+
+> *Depuis symfony 6, webpack est déjà configuré, il suffit simplement de télécharger les dépendances avec npm ou yarn.*
+
+>❗️ Attention❗️ 
+>Il faut toujours utiliser **le même gestionnaire de dépendances** au sein d'un projet, c'est à dire >que si tu choisis yarn install, tu n'utilises que yarn et jamais jamais npm. Si tu utilises npm à des >moments et yarn à d'autres, cela va créer des conflits 🧨 entre le ```package.json``` et le ```yarn.lock``` et ça c'est pas cool 😒
+
+
 >##### Démarrer le projet :
 >- Lancer le serveur web :
 > ```symfony server:start```
 >
 >- Écouter les modifications du dossier `./assets` :
 > ```npm run watch```
+
+
+### C'est partie 
