@@ -72,8 +72,8 @@
 ```
 
 ### 📍 Installer symfony/ux-twig-component & symfony/ux-live-components :
-```composer require symfony/ux-twig-component```
-```composer require symfony/ux-live-component```
+- ```composer require symfony/ux-twig-component```
+- ```composer require symfony/ux-live-component```
 
 ##### ➜ Configuration :
   - Dans le fichier `./assets/bootstrap.js` ajouter le code suivant:
@@ -105,3 +105,157 @@ app.register('live', LiveController);
 
 
 ### C'est partie pour notre premier live component 🔥
+
+1. Dans le dossier `./src/` créer un nouveau dossier `Components` et y ajouter un nouveau fichier `BlogpostComponent.php` et ajouter le code suivant :
+```php
+<?php
+
+namespace App\Components;
+
+use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
+
+#[AsTwigComponent('blogpost')]
+class BlogpostComponent
+{
+}
+```
+
+2. Dans le dossier `./templates/` créer un nouveau dossier `components` et y ajouter un nouveau fichier `blogpost.html.twig` et ajouter le code suivant :
+```html
+<div class="card m-4">
+    <div class="card-body">
+        <h5 class="card-title">un titre</h5>
+        <p class="card-text">du contenu</p>
+    </div>
+</div>
+```
+
+Nous allons maintenant essayer de comprendre comment le component que nous avons créé fonctionne.
+
+3. Dans le fichier `./templates/blog/index.html.twig` supprime le code généré par défault et remplace le par le code suivant :
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello BlogController!{% endblock %}
+
+{% block body %}
+    {{ component('blogpost') }}
+{% endblock %}
+```
+
+Rafraichis la page https://127.0.0.1:8000/blog et vois le component qui s'affiche. Pour le moment ce n'est que du contenu en dur mais l'avantage est que le component peut maintenant être appelé dans n'importe quel template, il est réutilisable.
+
+Maintenant que notre composant est en place, nous allons voir comment le rendre plus intelligent.
+
+4. Dans le fichier `./src/Components/BlogpostComponent.php` ajouter le code suivant :
+```php
+public string $title;
+public string $content;
+```
+
+5. Et dans le fichier `./templates/blog/index.html.twig` modifier le code en supprimant le contenu en dur par des variables twig :
+```html
+<div class="card m-4">
+    <div class="card-body">
+        <h5 class="card-title">{{ title }}</h5>
+        <p class="card-text">{{ content }}</p>
+    </div>
+</div>
+```
+
+⛔️ Si tu recharges la page Symfony lève une erreur car le component s'attend à recevoir des valeurs pour variables twig `title`et `content` qu'on ne lui a pas encore donné.
+
+6. Dans le fichier `./templates/blog/index.html.twig` modifier le code pour passer au component des valeurs :
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello BlogController!{% endblock %}
+
+{% block body %}
+    {{ component('blogpost', {
+        'title': 'My first blogpost',
+        'content': 'This is my first blogpost'
+    }) }}
+{% endblock %}
+```
+
+✅ Si tu recharges la page Symfony, tu vois le component qui s'affiche avec les nouveau contenus.
+
+🤨 Tu dois probablement te dire, "ok, mais c'est toujours du contenu en dur..." ! Effectivement, il est temps de récupérer les objets blog depuis la base de données ! 
+
+
+7. Retournons dans le fichier `./src/Components/BlogpostComponent.php` que nous allons maintenant ajuster pour qu'il récupère un objet blog depuis la base de données.
+A noter que le fichier BlogController.php est le controller du component blogpost.html.twig, il gère un objet à la fois. 
+On va donc effacer le code que nous avons et ajouter à la place une nouvelle propriété privé $id, qui représente l'id de l'objet blog. Puis nous allons ajouter une fonction getBlog() qui va se charger de récupérer un objet blog par son id en base de données.
+```php
+class BlogpostComponent
+{
+    public int $id;
+
+    public function __construct(private BlogRepository $blogRepository)
+    {}
+
+    public function getBlogpost(): Blog
+    {
+        return $this->blogRepository->find($this->id);
+    }
+}
+```
+
+8. Dans le fichier './templates/components/blogpost.html.twig' modifions le code comme ceci :
+```html
+<div class="card m-4">
+    <div class="card-body">
+        <h5 class="card-title">{{ this.blogpost.title }}</h5>
+        <p class="card-text">{{ this.blogpost.content }}</p>
+    </div>
+</div>
+```
+
+Utiliser this dans le template fait référence à la classe BlogpostComponent, autrement dit, a partir du this en twig j'ai accès aux méthodes publiques de la classe BlogpostComponent. Ainsi this.blogpost fait appel à la méthode getBlogpost() qui renvoit un objet blog. A partir de là je peux aller chercher la propriété de l'objet que je souhaite afficher ce qui donne `{{ this.blogpost.title }}` et `{{ this.blogpost.content }}`.
+
+⛔️ Si tu recharges la page Symfony lève encore une erreur ! En effet le component blogpost.html.twig s'attend maintenant à recevoir un id pour récupérer l'objet en entier et ainsi pourvoir afficher le titre et le content.
+
+9. Adaptons à nouveau notre code et retournons dans le fichier `./templates/blog/index.html.twig` et modifions le code comme ceci :
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello BlogController!{% endblock %}
+
+{% block body %}
+    {{ component('blogpost', { 'id': 1 }) }}
+{% endblock %}
+```
+
+✅ Si tu recharges la page, tu vois le component qui s'affiche avec les contenu du blog id 1 ! 
+Notre component est bien plus intelligent maintenant, mais je lui passe toujours une valeur en dur pour l'id... Voyons comment faire en sorte qu'il se charge tout seul d'afficher tous les objets depuis la base de données.
+
+1.  Dans le dossier `./src/Components` nous allons créer un nouveau fichier `AllBlogpostComponent.php` et ajoutons le code suivant :
+```php
+<?php
+
+namespace App\Components;
+
+use App\Repository\BlogRepository;
+use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
+
+#[AsTwigComponent('all_blogpost')]
+class AllBlogpostComponent
+{
+    public function __construct(private BlogRepository $blogRepository)
+    {}
+
+    public function getAllBlogpost(): array
+    {
+        return $this->blogRepository->findAll();
+    }
+}
+```
+
+Cette classe permet de récupérer tous les objets blog depuis la base de données.
+
+🧐 Remarque : 
+Lorsque l'on crée une classe qui gère un componant, on fait bien attention de nommer dans notre annotation @AsTwigComponent le nom du componant que l'on veut créer et ensuite de créer le fichier html.twig du même nom.
+Ex : 
+`@AsTwigComponent('all_blogpost')` => `./templates/components/all_blogpost.html.twig`
+`@AsTwigComponent('blogpost')` => `./templates/components/blogpost.html.twig`
