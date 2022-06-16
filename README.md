@@ -104,7 +104,7 @@ app.register('live', LiveController);
  ```npm run watch```
 
 
-### C'est partie pour notre premier live component 🔥
+### 🖥 C'est partie pour la création de notre premier live component 🔥
 
 1. Dans le dossier `./src/` créer un nouveau dossier `Components` et y ajouter un nouveau fichier `BlogpostComponent.php` et ajouter le code suivant :
 ```php
@@ -132,7 +132,7 @@ class BlogpostComponent
 
 Nous allons maintenant essayer de comprendre comment le component que nous avons créé fonctionne.
 
-3. Dans le fichier `./templates/blog/index.html.twig` supprime le code généré par défault et remplace le par le code suivant :
+1. Dans le fichier `./templates/blog/index.html.twig` supprime le code généré par défault et remplace le par :
 ```twig
 {% extends 'base.html.twig' %}
 
@@ -163,9 +163,9 @@ public string $content;
 </div>
 ```
 
-⛔️ Si tu recharges la page Symfony lève une erreur car le component s'attend à recevoir des valeurs pour variables twig `title`et `content` qu'on ne lui a pas encore donné.
+⛔️ Si tu recharges la page, Symfony lève une erreur car le component s'attend à recevoir des valeurs pour les variables twig `title`et `content` qu'on ne lui a pas encore donné.
 
-6. Dans le fichier `./templates/blog/index.html.twig` modifier le code pour passer au component des valeurs :
+6. Dans le fichier `./templates/blog/index.html.twig` modifie le code pour passer au component des valeurs pour le titre et le contenu :
 ```twig
 {% extends 'base.html.twig' %}
 
@@ -179,14 +179,14 @@ public string $content;
 {% endblock %}
 ```
 
-✅ Si tu recharges la page Symfony, tu vois le component qui s'affiche avec les nouveau contenus.
+✅ Si tu recharges la page, tu vois le component qui s'affiche avec les nouveaux contenus.
 
-🤨 Tu dois probablement te dire, "ok, mais c'est toujours du contenu en dur..." ! Effectivement, il est temps de récupérer les objets blog depuis la base de données ! 
+🤨 Tu dois probablement te dire, *"ok, mais c'est toujours du contenu en dur..."* ! Effectivement, il est temps de d'apporter plus de logique afin de récupérer les objets blog depuis la base de données ! 
 
 
 7. Retournons dans le fichier `./src/Components/BlogpostComponent.php` que nous allons maintenant ajuster pour qu'il récupère un objet blog depuis la base de données.
-A noter que le fichier BlogController.php est le controller du component blogpost.html.twig, il gère un objet à la fois. 
-On va donc effacer le code que nous avons et ajouter à la place une nouvelle propriété privé $id, qui représente l'id de l'objet blog. Puis nous allons ajouter une fonction getBlog() qui va se charger de récupérer un objet blog par son id en base de données.
+A noter que le fichier BlogController.php est le "manager" du component blogpost.html.twig, il gère un objet à la fois. 
+On va donc effacer le code que nous avons et ajouter à la place une nouvelle propriété privé $id à notre classe, qui représente l'id d'un objet blog. Puis nous allons ajouter une fonction getBlog() qui va se charger de récupérer un objet blog par son id en base de données depuis son Repository.
 ```php
 class BlogpostComponent
 {
@@ -212,11 +212,11 @@ class BlogpostComponent
 </div>
 ```
 
-Utiliser this dans le template fait référence à la classe BlogpostComponent, autrement dit, a partir du this en twig j'ai accès aux méthodes publiques de la classe BlogpostComponent. Ainsi this.blogpost fait appel à la méthode getBlogpost() qui renvoit un objet blog. A partir de là je peux aller chercher la propriété de l'objet que je souhaite afficher ce qui donne `{{ this.blogpost.title }}` et `{{ this.blogpost.content }}`.
+>🔖 Utiliser this dans le template fait référence à la classe BlogpostComponent, autrement dit, a partir du this en twig j'ai accès aux méthodes publiques de la classe BlogpostComponent. Ainsi quand j'écris en twig this.blogpost c'est la méthode getBlogpost() du BlogpostComponent.php que se joue et qui renvoit un objet blog. A partir de là je peux aller chercher la propriété de l'objet que je souhaite afficher ce qui donne `{{ this.blogpost.title }}` et `{{ this.blogpost.content }}`.
 
 ⛔️ Si tu recharges la page Symfony lève encore une erreur ! En effet le component blogpost.html.twig s'attend maintenant à recevoir un id pour récupérer l'objet en entier et ainsi pourvoir afficher le titre et le content.
 
-9. Adaptons à nouveau notre code et retournons dans le fichier `./templates/blog/index.html.twig` et modifions le code comme ceci :
+1. Adaptons à nouveau notre code et retournons dans le fichier `./templates/blog/index.html.twig`, modifions le code comme ceci :
 ```twig
 {% extends 'base.html.twig' %}
 
@@ -228,9 +228,9 @@ Utiliser this dans le template fait référence à la classe BlogpostComponent, 
 ```
 
 ✅ Si tu recharges la page, tu vois le component qui s'affiche avec les contenu du blog id 1 ! 
-Notre component est bien plus intelligent maintenant, mais je lui passe toujours une valeur en dur pour l'id... Voyons comment faire en sorte qu'il se charge tout seul d'afficher tous les objets depuis la base de données.
+Notre component est bien plus intelligent maintenant, mais je lui passe toujours une valeur en dur pour l'id... Voyons comment faire pour que tous mes objets blogs soient chargés depuis la base de données.
 
-1.  Dans le dossier `./src/Components` nous allons créer un nouveau fichier `AllBlogpostComponent.php` et ajoutons le code suivant :
+10.  Dans le dossier `./src/Components` nous allons créer un nouveau fichier `AllBlogpostComponent.php` et ajouter le code suivant :
 ```php
 <?php
 
@@ -259,3 +259,25 @@ Lorsque l'on crée une classe qui gère un componant, on fait bien attention de 
 Ex : 
 `@AsTwigComponent('all_blogpost')` => `./templates/components/all_blogpost.html.twig`
 `@AsTwigComponent('blogpost')` => `./templates/components/blogpost.html.twig`
+
+11. Créons maintenant le fichier `./templates/components/all_blogpost.html.twig` et ajoutons le code suivant :
+```twig
+{% for blogpost in this.allBlogpost %}
+    {{ component('blogpost', { 'id': blogpost.id }) }}
+{% endfor %}
+```
+
+Ce nouveau component se charge de récupérer tous les objets blog depuis la base de données et de les repasser à notre premier component blogpost.html.twig qui se charge lui même d'afficher les données de chacun des objets à chaque tour de boucle.
+
+12.  Enfin nous allons ajuster le fichier `./templates/blog/index.html.twig` :
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello BlogController!{% endblock %}
+
+{% block body %}
+    {{ component('all_blogpost') }}
+{% endblock %}
+```
+
+✅ En rechargeant la page, on peut voir maintenant que tous nos objets blog s'affichent ! 
