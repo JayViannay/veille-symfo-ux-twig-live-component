@@ -282,7 +282,7 @@ Ce nouveau component se charge de récupérer tous les objets blog depuis la bas
 
 ✅ En rechargeant la page, on peut voir maintenant que tous nos objets blog s'affichent ! <br>
 
-#### Pour conclure avec les :
+#### Pour conclure avec les twig components:
 > L'avantage d'utiliser des twig components est que le code est plus maintenable et *SOLID* : <br>
 > Si je souhaite changer le design de l'affichage d'un blog, je modifie seulement blogpost.html.twig<br>
 > Si je souhaite changer la manière dont j'itère sur les objets blog, je modifie seulement le code du component all_blogpost.html.twig. <br>
