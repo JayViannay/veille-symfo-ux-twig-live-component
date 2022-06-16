@@ -255,10 +255,10 @@ class AllBlogpostComponent
 Cette classe permet de récupérer tous les objets blog depuis la base de données.
 
 🧐 Remarque : 
-Lorsque l'on crée une classe qui gère un componant, on fait bien attention de nommer dans notre annotation @AsTwigComponent le nom du componant que l'on veut créer et ensuite de créer le fichier html.twig du même nom.
-Ex : 
-`@AsTwigComponent('all_blogpost')` => `./templates/components/all_blogpost.html.twig`
-`@AsTwigComponent('blogpost')` => `./templates/components/blogpost.html.twig`
+Lorsque l'on crée une classe qui gère un componant, on fait bien attention de nommer dans notre annotation @AsTwigComponent le nom du componant que l'on veut créer et ensuite de créer le fichier html.twig du même nom. <br>
+Ex : <br>
+`@AsTwigComponent('all_blogpost')` => `./templates/components/all_blogpost.html.twig` <br>
+`@AsTwigComponent('blogpost')` => `./templates/components/blogpost.html.twig` <br>
 
 11. Créons maintenant le fichier `./templates/components/all_blogpost.html.twig` et ajoutons le code suivant :
 ```twig
@@ -280,4 +280,12 @@ Ce nouveau component se charge de récupérer tous les objets blog depuis la bas
 {% endblock %}
 ```
 
-✅ En rechargeant la page, on peut voir maintenant que tous nos objets blog s'affichent ! 
+✅ En rechargeant la page, on peut voir maintenant que tous nos objets blog s'affichent ! <br>
+
+L'avantage d'utiliser des twig components est que le code est plus maintenable et *SOLID* ! <br>
+Si je souhaite changer le design de l'affichage d'un blog, je modifie seulement blogpost.html.twig<br>
+Si je souhaite changer la manière dont j'itère sur les objets blog, je modifie seulement le code du component all_blogpost.html.twig. <br>
+Si je souhaite ajouter des fonctionnalités (CRUD par ex) à mon objet blog alors je modifie le code des classes BlogpostComponent et ou AllBlogpostComponent. <br>
+Etc ... <br>
+
+Voyons maintenant les live componant, une fonctionnalité également récemment introduite dans symfony qui nous permet d'avoir des components réactifs sans une ligne de javascript ! 
