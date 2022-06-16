@@ -291,7 +291,38 @@ Ce nouveau component se charge de récupérer tous les objets blog depuis la bas
 > Cependant, il faut garder à l'esprit que c'est une fonctionnalité qui reste pour le moment encore experimentale dans symfony. <br>
 > Mais vu comment c'est pratique il y a quand même peut-être une chance que ça soit maintenu et même amélioré dans les prochaines versions de symfony.
 
-Voyons maintenant les live componant, une fonctionnalité également récemment introduite dans symfony qui nous permet d'avoir des components réactifs sans une ligne de javascript ! 
-
 ### 🖥 C'est partie pour le live component 🔥
 [...wip]
+
+Voyons maintenant les live componants, une fonctionnalité également récemment introduite dans symfony qui nous permet d'avoir des composants réactifs sans une ligne de javascript ! <br>
+
+1. Première étape, la partie php :
+
+- Dans le dossier `./src/Components` nous allons créer un nouveau fichier `BlogpostSearchComponent.php` et ajouter le code suivant :
+```php
+<?php
+
+namespace App\Components;
+
+use App\Repository\BlogRepository;
+use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\DefaultActionTrait;
+
+#[AsLiveComponent('blogpost_search')]
+class BlogpostSearchComponent
+{
+    use DefaultActionTrait;
+
+    #[LiveProp(writable: true)]
+    public string $query = '';
+
+    public function __construct(private BlogRepository $blogRepository) {}
+
+    public function getBlogposts(): void
+    {
+        $this->blogRepository->findByQuery($this->query);
+    }
+}
+```
+
