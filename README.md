@@ -282,14 +282,13 @@ Ce nouveau component se charge de récupérer tous les objets blog depuis la bas
 
 ✅ En rechargeant la page, on peut voir maintenant que tous nos objets blog s'affichent ! <br>
 
->Pour conclure : <br>
-> <br>
+#### Pour conclure :
 >L'avantage d'utiliser des twig components est que le code est plus maintenable et *SOLID* : <br>
 >Si je souhaite changer le design de l'affichage d'un blog, je modifie seulement blogpost.html.twig<br>
 >Si je souhaite changer la manière dont j'itère sur les objets blog, je modifie seulement le code du component all_blogpost.html.twig. <br>
 >Si je souhaite ajouter des fonctionnalités (CRUD par ex) à mon objet blog alors je modifie le code des classes BlogpostComponent et ou AllBlogpostComponent. <br>
 >Etc ... <br>
 > Cependant, il faut garder à l'esprit que c'est une fonctionnalité qui reste pour le moment encore experimentale dans symfony. <br>
-> Vu comment c'est pratique il y a quand même peut-être une chance que ça soit maintenu et même amélioré dans les prochaines versions de symfony.
+> Mais vu comment c'est pratique il y a quand même peut-être une chance que ça soit maintenu et même amélioré dans les prochaines versions de symfony.
 
 Voyons maintenant les live componant, une fonctionnalité également récemment introduite dans symfony qui nous permet d'avoir des components réactifs sans une ligne de javascript ! 
