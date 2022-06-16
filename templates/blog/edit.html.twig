@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block body %}
+<div class="container">
+    {{ component('edit_blogpost', { blogpost : blogpost }) }}
+</div>
+{% endblock %}
