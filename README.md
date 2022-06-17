@@ -291,10 +291,10 @@ Ce nouveau component se charge de récupérer tous les objets blog depuis la bas
 > Cependant, il faut garder à l'esprit que c'est une fonctionnalité qui reste pour le moment encore experimentale dans symfony. <br>
 > Mais vu comment c'est pratique il y a quand même peut-être une chance que ça soit maintenu et même amélioré dans les prochaines versions de symfony.
 
-### 🖥 C'est partie pour le live component 🔥
+### 🖥 C'est partie pour les live components 🔥
 [...wip]
 
-Voyons maintenant les live componants, une fonctionnalité également récemment introduite dans symfony qui nous permet d'avoir des composants réactifs sans une ligne de javascript ! <br>
+Voyons maintenant les live components, une fonctionnalité également récemment introduite dans symfony qui nous permet d'avoir des composants réactifs sans une ligne de javascript ! <br>
 
 1. Première étape, la partie php :
 
@@ -381,3 +381,126 @@ public function search(): Response
 ✅ On peut maintenant se rendre sur la page `/search` et faire une recherche ! <br>
 Les objets sont mis à jour automatiquement lorsque le champ de recherche change. <br>
 Sans avoir écrit un seule ligne de javascript 🙌  <br>
+
+#### 🖥 Edit Blog - Live Component 🔥
+
+[...wip]
+Nous allons maintenant allé un peu plus loin et créer un nouveau component qui permet de modifier un blog sans rechargement de la page. <br>
+L'idée est de pouvoir être en mode édition d'un blog tout en pouvant visualisé les modifications qui sont faites en temps réel, toujours sans une seule ligne de javascript ! <br>
+
+C'est partie ! 
+
+1. Dans le dossier `./src/Components` nous allons créer un nouveau fichier `EditBlogpostComponent.php` et ajouter le code suivant :
+```php
+<?php
+
+namespace App\Components;
+
+use App\Entity\Blog;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
+use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\ValidatableComponentTrait;
+
+#[AsLiveComponent('edit_blogpost')]
+final class EditBlogpostComponent extends AbstractController {
+    
+    use DefaultActionTrait;
+
+    use ValidatableComponentTrait;
+
+    #[LiveProp(exposed: ['title', 'content'])]
+    #[Assert\Valid]
+    public Blog $blogpost;
+
+    public bool $isSaved = false;
+
+    #[LiveAction]
+    public function save(EntityManagerInterface $em) {
+        $this->validate();
+
+        $this->isSaved = true;
+        $em->flush();
+    }
+}
+```
+
+2. Dans le dossier './template/components' créer un nouveau fichier `edit_blogpost.html.twig` et ajouter le code suivant :
+```html
+<div {{ attributes }}>
+    <div>
+        <h1>{{blogpost.title}}</h1>
+        <hr>
+        <!-- title field -->
+        <div class="mb-3">
+            <label for="blogpost_title" class="form-label">
+                <h2>Title</h2>
+            </label>
+            <div class="input-group">
+                <input type="text" data-model="blogpost.title" data-action="live#update" class="form-control"
+                    value="{{ blogpost.title }}" id="blogpost_title">
+            </div>
+        </div>
+        <!-- content field -->
+        <div class="mb-3">
+            <label for="blogpost_content" class="form-label">
+                <h2>Content</h2>
+            </label>
+            <div class="input-group">
+                <textarea type="text" data-model="blogpost.content" data-action="live#update" class="form-control"
+                    value="{{ blogpost.title }}" id="blogpost_content">{{ blogpost.content }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display preview -->
+    <div class="my-5 p-5 shadow bg-secondary text-light">
+        <h3>{{ blogpost.title }}</h3>
+        {{ blogpost.content }}
+    </div>
+
+    <!-- Save Action -->
+    <div class="d-grid gap-2">
+        <button data-action="live#action" data-action-name="save" class="btn btn-primary btn-sm">Enregistrer les
+            modifications</button>
+    </div>
+
+    <!-- Display success -->
+    {% if isSaved %}
+    <div class="alert alert-success my-4">Enregistré !</div>
+    {% endif %}
+
+</div>
+```
+
+3. Dans le controller `./src/Controller/BlogController.php` ajouter le code suivant :
+```php
+#[Route('/edit/{id}', name: 'app_edit')]
+public function edit(Blog $blogpost): Response
+{
+    return $this->render('blog/edit.html.twig', [
+        'blogpost' => $blogpost,
+    ]);
+}
+```
+
+4. Dans le dossier `./templates/blog` créer un nouveau fichier `edit.html.twig` et ajouter le code suivant :
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block body %}
+<div class="container">
+    {{ component('edit_blogpost', { blogpost : blogpost }) }}
+</div>
+{% endblock %}
+```
+
+✅ On peut maintenant se rendre sur la page `/edit` et tester notre nouvelle fonctionnalité ! <br>
+L'objet est mis à jour en mode edition et préview !<br>
+Sans avoir écrit un seule ligne de javascript encore une fois 🙌 <br>
